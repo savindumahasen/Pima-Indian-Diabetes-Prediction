@@ -3,8 +3,6 @@ import pickle
 
 
 app =Flask(__name__)
-
-
 model_path = "./pickle.h5"
 model = pickle.load(open(model_path, 'rb'))
 
