@@ -29,9 +29,9 @@ def predict():
 
         # Set result based on prediction
         if prediction == 0:
-            result = "Heart Disease is not predicted"
+            result = "Diabetes is not predicted"
         else:
-            result = "Heart Disease predicted"
+            result = "Diabetes is predicted"
 
         return jsonify({'result': result, 'probability': probabilities[1]})
     except Exception as e:
