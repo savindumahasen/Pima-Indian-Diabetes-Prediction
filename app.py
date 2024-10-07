@@ -1,39 +1,41 @@
-from flask import Flask, render_template, request,jsonify
+from flask import Flask, render_template, request, jsonify
 import pickle
+import numpy as np
 
+app = Flask(__name__)
 
-app =Flask(__name__)
-model_path = "./pickle.h5"
-model = pickle.load(open(model_path, 'rb'))
-
+# Load your ML model (ensure the file path and format are correct)
+model_path = "./pickle.h5"  # assuming it's a pickle model
+with open(model_path, 'rb') as model_file:
+    model = pickle.load(model_file)
 
 @app.route('/')
 def home():
     return render_template('index.html')
-@app.route('/predict', method=['POST'])
+
+@app.route('/predict', methods=['POST'])
 def predict():
-    feature_names= ['0','1','2','3','4','5','6','7']
-    features =[float(request.form(f)) for f in feature_names]
-    input_data = [features]
+    try:
+        # Define feature names in order
+        feature_names = ['0', '1', '2', '3', '4', '5', '6', '7']
 
-    ## Make thw prediction
-    prediction = model.predict(input_data)
-    probabilities = model.predict(input_data)[0]
+        # Extract features from form data
+        features = [float(request.form.get(f)) for f in feature_names]
+        input_data = [features]
 
-    if prediction[0]==0:
-        result = "Heart Disease is not predicted"
-    else:
-        result = "Heart Disase predicted";
+        # Perform prediction
+        prediction = model.predict(input_data)[0]
+        probabilities = model.predict_proba(input_data)[0]  # Assuming the model has predict_proba
 
+        # Set result based on prediction
+        if prediction == 0:
+            result = "Heart Disease is not predicted"
+        else:
+            result = "Heart Disease predicted"
 
-    return jsonify({'result':result, 'probebilities':probabilities[1]})
+        return jsonify({'result': result, 'probability': probabilities[1]})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-
-
-if __name__ =='__main__':
+if __name__ == '__main__':
     app.run(debug=True)
-
-  
-
-
-
